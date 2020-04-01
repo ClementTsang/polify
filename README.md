@@ -4,7 +4,12 @@ Low-poly image generator library. Written in Rust, compatible with WebAssembly. 
 
 ## Usage of library
 
-If you wish to use the library,
+If you wish to use the library, simply just import it into Cargo.toml:
+
+```toml
+```
+
+Documentation for the library can be found [here]().
 
 ## Contribution/Bugs
 
