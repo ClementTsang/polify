@@ -1,7 +1,14 @@
-//! A library for quickly generating low-polygon images from a source picture.
-//! Techniques based on the ones described here: <https://cjqian.github.io/docs/tri_iw_paper.pdf>
+//! A library for generating a low-poly images.
 
-extern crate image;
+#![deny(missing_docs)]
+#![deny(broken_intra_doc_links)]
+#![deny(unused_results)]
+#![forbid(rust_2018_idioms)]
 
-mod polifier;
-pub use polifier::{polify_image, triangulation_polify_image};
+pub mod error;
+pub mod image;
+pub mod triangulation;
+
+pub use crate::image::*;
+pub use error::*;
+pub use triangulation::*;
