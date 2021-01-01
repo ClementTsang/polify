@@ -1,8 +1,7 @@
 //! API to load an image in the first place.
 
-use std::path::Path;
-
 use image::{io::Reader as ImageReader, DynamicImage};
+use std::path::Path;
 
 /// Loads an image from `load_path`.
 pub fn load_image<P>(load_path: P) -> crate::error::Result<DynamicImage>

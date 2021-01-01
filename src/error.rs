@@ -12,10 +12,13 @@ pub enum PolifyError {
     #[error("file already exists at {0}")]
     /// An error if a file already exists at the given save location.
     FileAlreadyExists(String),
+    #[error("no triangulation exists for this input")]
+    /// An error formed if triangulation fails.
+    Triangulation,
     /// An unknown error.
     #[error("unknown error")]
     Unknown,
 }
 
-/// A `Result` type with a [`TuineError`].
+/// A `Result` type with a [`PolifyError`].
 pub type Result<T> = std::result::Result<T, PolifyError>;
