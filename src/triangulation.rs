@@ -13,9 +13,6 @@ use rand::seq::IteratorRandom;
 /// A [`TriangulationConfig`] are the parameters that will affect the triangulation
 /// algorithm's output.
 pub struct TriangulationConfig {
-    /// The percentage of vertices / total pixel count we want in our output.
-    pub rate: f32,
-
     /// The maximum number of vertices we want.
     pub max_vertices: u32,
 
@@ -54,7 +51,6 @@ pub fn triangulate_image(image: &DynamicImage, config: &TriangulationConfig) -> 
     // Next, node detection.
     let node_list = node_detection(
         preprocessed_image,
-        config.rate,
         config.max_vertices,
         config.edge_threshold,
     );
@@ -88,14 +84,11 @@ pub fn preprocess_image(
 /// Detects nodes in a pre-processed image.
 pub fn node_detection(
     preprocessed_image: PreprocessedImage,
-    rate: f32,
     max_vertices: u32,
     edge_threshold: f64,
 ) -> NodeList {
     let mut rng = rand::thread_rng();
     let (width, height) = preprocessed_image.0.dimensions();
-    let max_nodes =
-        std::cmp::min(max_vertices, (rate * width as f32 * height as f32) as u32) as usize;
 
     let mut node_list: Vec<delaunator::Point> = vec![];
 
@@ -121,7 +114,23 @@ pub fn node_detection(
         }
     }
 
-    let node_list = node_list.into_iter().choose_multiple(&mut rng, max_nodes);
+    let mut node_list = node_list
+        .into_iter()
+        .choose_multiple(&mut rng, max_vertices as usize - 4);
+
+    node_list.push(delaunator::Point { x: 0.0, y: 0.0 });
+    node_list.push(delaunator::Point {
+        x: 0.0,
+        y: height as f64,
+    });
+    node_list.push(delaunator::Point {
+        x: width as f64,
+        y: 0.0,
+    });
+    node_list.push(delaunator::Point {
+        x: width as f64,
+        y: height as f64,
+    });
 
     NodeList(node_list)
 }
