@@ -116,20 +116,20 @@ pub fn node_detection(
 
     let mut node_list = node_list
         .into_iter()
-        .choose_multiple(&mut rng, max_vertices as usize - 4);
+        .choose_multiple(&mut rng, max_vertices as usize);
 
     node_list.push(delaunator::Point { x: 0.0, y: 0.0 });
     node_list.push(delaunator::Point {
         x: 0.0,
-        y: height as f64,
+        y: height as f64 - 1.0,
     });
     node_list.push(delaunator::Point {
-        x: width as f64,
+        x: width as f64 - 1.0,
         y: 0.0,
     });
     node_list.push(delaunator::Point {
-        x: width as f64,
-        y: height as f64,
+        x: width as f64 - 1.0,
+        y: height as f64 - 1.0,
     });
 
     NodeList(node_list)

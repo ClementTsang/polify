@@ -30,7 +30,7 @@ fn triangulate_image(load: &str, save: &str) {
     let trig = polify::triangulate_image(
         &loaded,
         &polify::TriangulationConfig {
-            max_vertices: 5000,
+            max_vertices: 4500,
             edge_threshold: 20.0,
             low_threshold: 0.05,
             high_threshold: 5.0,
