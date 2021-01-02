@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Polify</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.0/dist/css/bulma-slider.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.4/dist/js/bulma-slider.min.js"></script>
+
+    <link rel="stylesheet" href="index.css">
+
+    <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" defer></script>
+    <script src="./index.js" defer></script>
+  </head>
+  <body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title is-2">
+        Polify
+      </h1>
+      <p class="subtitle">
+        A demo site for the <a href="https://github.com/ClementTsang/polify">Polify</a> library.
+      </p>
+
+      <div class="tabs ">
+        <ul>
+          <li class="is-active" id="paste-image"><a>Paste image URL</a></li>
+          <li id="upload-image"><a>Upload an Image</a></li>
+        </ul>
+      </div>
+
+      <input class="input is-primary" placeholder="https://images.unsplash.com/photo-1608692702444-3ff552418fb0" id="paste-image-action"></input>
+
+      <div class="block">
+        <div class="file has-name is-hidden" id="upload-image-action">
+          <label class="file-label">
+            <input class="file-input" type="file" name="resume">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Browse…
+              </span>
+            </span>
+            <span class="file-name">
+              
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="block">
+        <nav class="level">
+          <div class="level-left">
+            <div class="level-item">
+              <p class="subtitle is-flex">
+                Max vertices
+              </p>
+            </div>
+          </div> 
+          <div class="level-right">
+            <div class="level-item">
+              <input id="maxVertices" class="slider has-output" min="100" max="5000" value="500" step="1" type="range">
+              <output for="maxVertices">500</output>
+            </div>
+          </div>
+        </nav>
+
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <div class="level-item">
+              <p class="subtitle is-flex">
+                Edge threshold
+              </p>
+            </div>
+          </div> 
+          <div class="level-right">
+            <div class="level-item">
+              <input id="edgeThreshold" class="slider has-output" min="0.0" max="500.0" value="10.0" step="0.1" type="range">
+              <output for="edgeThreshold">10.0</output>
+            </div>
+          </div>
+        </nav>
+
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <div class="level-item">
+              <p class="subtitle is-flex">
+                Low threshold
+              </p>
+            </div>
+          </div> 
+          <div class="level-right">
+            <div class="level-item">
+              <input id="lowThreshold" class="slider has-output" min="0.01" max="5.0" value="0.05" step="0.01" type="range">
+              <output for="lowThreshold">0.05</output>
+            </div>
+          </div>
+        </nav>
+
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <div class="level-item">
+              <p class="subtitle is-flex">
+                High threshold
+              </p>
+            </div>
+          </div> 
+          <div class="level-right">
+            <div class="level-item">
+              <input id="highThreshold" class="slider has-output" min="1.0" max="1140" value="10.0" step="0.01" type="range">
+              <output for="highThreshold">10.0</output>
+            </div>
+          </div>
+        </nav>
+
+      </div>
+      
+
+      <div class="block">
+        <img src="ulrich-mareli.jpg">
+        <p class="subtitle is-6">
+          Demo image can be found <a href="https://unsplash.com/photos/5gtsxpZPrkg">here</a>, credit to Ulrich and Mareli Aspeling.
+        </p>
+      </div>
+    </div>
+  </section>
+  </body>
+</html>
