@@ -15,9 +15,15 @@ pub enum PolifyError {
     #[error("no triangulation exists for this input")]
     /// An error formed if triangulation fails.
     Triangulation,
-    /// An unknown error.
-    #[error("unknown error")]
-    Unknown,
+    #[error("setting is not valid: {0}")]
+    /// An error formed if a setting is invalid.
+    InvalidSetting(String),
+    /// An error during RGB conversion.
+    #[error("rgb conversion failed")]
+    RgbConversion,
+    /// An error during Luma conversion.
+    #[error("luma conversion failed")]
+    LumaConversion,
 }
 
 /// A `Result` type with a [`PolifyError`].

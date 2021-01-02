@@ -35,6 +35,7 @@ fn triangulate_image(load: &str, save: &str) {
             low_threshold: 0.05,
             high_threshold: 5.0,
         },
-    );
+    )
+    .unwrap();
     polify::save_image(trig, save, true).unwrap();
 }

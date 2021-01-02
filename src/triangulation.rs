@@ -19,10 +19,20 @@ pub struct TriangulationConfig {
     /// The minimal strength of potential vertices.
     pub edge_threshold: f64,
 
-    /// Low threshold for edge detection in preprocess step.  Must be greater than 0.0.
+    /// Low threshold for edge detection in preprocess step.  Must be greater than 0.0, and must
+    /// be strictly smaller than high_threshold, otherwise an error will be thrown when trying to
+    /// preprocess.
+    ///
+    /// Anything between [`low_threshold`] and [`high_threshold`] will be removed during
+    /// edge detection.
     pub low_threshold: f32,
 
-    /// High threshold for edge detection in preprocess step.  Must be less than 1140.39.
+    /// High threshold for edge detection in preprocess step.  Must be less than 1140, and must
+    /// be strictly greater than threshold, otherwise an error will be thrown when trying to
+    /// preprocess.
+    ///
+    /// Anything between [`low_threshold`] and [`high_threshold`] will be removed during
+    /// edge detection.
     pub high_threshold: f32,
 }
 
@@ -42,10 +52,13 @@ pub struct NodeList(Vec<delaunator::Point>);
 /// - [`triangulation`] to compute the triangulation of the node-detected image.
 ///
 /// You can instead call these functions manually if you wish to alter the steps in any way.
-pub fn triangulate_image(image: &DynamicImage, config: &TriangulationConfig) -> DynamicImage {
+pub fn triangulate_image(
+    image: &DynamicImage,
+    config: &TriangulationConfig,
+) -> crate::error::Result<DynamicImage> {
     // First, we preprocess.
     let preprocessed_image: PreprocessedImage =
-        preprocess_image(image, config.low_threshold, config.high_threshold);
+        preprocess_image(image, config.low_threshold, config.high_threshold)?;
     let (width, height) = preprocessed_image.0.dimensions();
 
     // Next, node detection.
@@ -56,7 +69,7 @@ pub fn triangulate_image(image: &DynamicImage, config: &TriangulationConfig) -> 
     );
 
     // Lastly, triangulation.
-    triangulation(node_list, image, width, height).unwrap()
+    Ok(triangulation(node_list, image, width, height)?)
 }
 
 /// Preprocesses the image.
@@ -64,21 +77,29 @@ pub fn preprocess_image(
     image: &DynamicImage,
     low_threshold: f32,
     high_threshold: f32,
-) -> PreprocessedImage {
-    assert!(
-        low_threshold > 0.0,
-        "The low threshold must be greater than 0.0!"
-    );
-    assert!(
-        high_threshold < 1140.39,
-        "The high threshold must be less than 1140.39!"
-    );
+) -> crate::error::Result<PreprocessedImage> {
+    if low_threshold <= 0.0 {
+        return Err(crate::error::PolifyError::InvalidSetting(
+            "low_threshold must be greater than 0.0".to_string(),
+        ));
+    } else if high_threshold >= 1140.0 {
+        return Err(crate::error::PolifyError::InvalidSetting(
+            "high_threshold must be less than than 1140".to_string(),
+        ));
+    } else if low_threshold >= high_threshold {
+        return Err(crate::error::PolifyError::InvalidSetting(
+            "low_threshold must be less than high_threshold".to_string(),
+        ));
+    }
 
-    PreprocessedImage(canny(
-        image.grayscale().as_luma8().unwrap(),
+    Ok(PreprocessedImage(canny(
+        image
+            .grayscale()
+            .as_luma8()
+            .ok_or(crate::error::PolifyError::LumaConversion)?,
         low_threshold,
         high_threshold,
-    ))
+    )))
 }
 
 /// Detects nodes in a pre-processed image.
@@ -147,7 +168,9 @@ pub fn triangulation(
 
     // Now let's convert the triangulation into an image.
     let mut img = RgbImage::new(width, height);
-    let rgb_img = image.as_rgb8().unwrap();
+    let rgb_img = image
+        .as_rgb8()
+        .ok_or(crate::error::PolifyError::RgbConversion)?;
     let consecutive_slices = consecutive_slices(&triangulation.triangles, 3);
     for points in consecutive_slices {
         // Assert should hopefully mean we optimize out bounds check...
