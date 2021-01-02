@@ -1,0 +1,15 @@
+{
+  "name": "polify_demo",
+  "version": "1.0.0",
+  "description": "Demo page for the Polify library.",
+  "main": "index.js",
+  "scripts": {
+    "serve": "browser-sync start --server \"dist\" --files \"dist\""
+  },
+  "author": "Clement Tsang",
+  "license": "ISC",
+  "repository": "https://github.com/ClementTsang/polify",
+  "devDependencies": {
+    "browser-sync": "^2.26.13"
+  }
+}

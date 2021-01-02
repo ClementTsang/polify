@@ -1,10 +1,10 @@
-# polify
+# Polify
 
 WIP
 
 ---
 
-Low-poly image generator library. Written in Rust, compatible with WebAssembly. Try it out [here]()!
+Low-poly image generator library. Written in Rust, compatible with WebAssembly.
 
 ## Usage of library
 
