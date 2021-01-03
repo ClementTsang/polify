@@ -4,7 +4,7 @@ WIP
 
 ---
 
-Low-poly image generator library. Written in Rust, compatible with WebAssembly.
+Low-poly image generator library. Written in Rust, with planned WebAssembly support.
 
 ## Usage of library
 

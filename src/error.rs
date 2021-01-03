@@ -18,6 +18,9 @@ pub enum PolifyError {
     #[error("setting is not valid: {0}")]
     /// An error formed if a setting is invalid.
     InvalidSetting(String),
+    /// An error during preproccessing.
+    #[error("preprocessing failed")]
+    PreProcessing,
     /// An error during RGB conversion.
     #[error("rgb conversion failed")]
     RgbConversion,
