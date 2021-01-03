@@ -67,20 +67,20 @@ class PolifyDemo {
         const highThresholdSlider = document.getElementById("high-threshold")
         const lowThresholdSlider = document.getElementById("low-threshold")
 
-        maxVerticesSlider.onchange = () => {
-            const newValue = maxVerticesSlider.value.parseInt();
+        maxVerticesSlider.onmouseup = () => {
+            const newValue = parseInt(maxVerticesSlider.value);
         }
 
-        edgeThresholdSlider.onchange = () => {
-            const newValue = edgeThresholdSlider.value.parseFloat();
+        edgeThresholdSlider.onmouseup = () => {
+            const newValue = parseFloat(edgeThresholdSlider.value);
         }
 
-        highThresholdSlider.onchange = () => {
-            const newValue = highThresholdSlider.value.parseFloat();
+        highThresholdSlider.onmouseup = () => {
+            const newValue = parseFloat(highThresholdSlider.value);
         }
 
-        lowThresholdSlider.onchange = () => {
-            const newValue = lowThresholdSlider.value.parseFloat();
+        lowThresholdSlider.onmouseup = () => {
+            const newValue = parseFloat(lowThresholdSlider.value);
         }
 
         const polifySwitch = document.getElementById("polify-switch");
