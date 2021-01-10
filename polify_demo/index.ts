@@ -13,8 +13,8 @@ class PolifyDemo {
   constructor() {
     this.isUsingPaste = true;
     this.isProcessing = false;
-    this.imageObjectUrl = null;
     this.polyObjectUrl = null;
+    this.imageObjectUrl = defaultImage;
 
     const pasteImageTab = document.getElementById("paste-image");
     const uploadImageTab = document.getElementById("upload-image");
@@ -38,15 +38,13 @@ class PolifyDemo {
       uploadImageAction.classList.remove("is-hidden");
     });
 
-    this.imageObjectUrl = null;
     const uploadImageActionInput: HTMLInputElement = document.querySelector(
       "#upload-image-action input[type=file]"
     );
     const displayedImage: HTMLImageElement = document.getElementById(
       "displayed-image"
     ) as HTMLImageElement;
-
-    displayedImage.src = defaultImage;
+    displayedImage.src = this.imageObjectUrl;
 
     uploadImageActionInput.onchange = () => {
       if (uploadImageActionInput.files.length > 0) {
