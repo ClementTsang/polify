@@ -9,10 +9,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.0/dist/css/bulma-switch.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.4/dist/js/bulma-slider.min.js"></script>
 
-    <link rel="stylesheet" href="index.css">
-
     <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" defer></script>
-    <script src="./index.js" defer></script>
+    <script src="./bootstrap.js"></script>
+
   </head>
   <body>
     <section class="section">
@@ -33,7 +32,7 @@
 
         <div class="is-flex is-flex-direction-row" id="paste-image-action">
           <input class="input is-primary" placeholder="https://images.unsplash.com/photo-1608692702444-3ff552418fb0"></input>
-          <button class="button is-primary ml-2">Upload</button>
+          <button class="button is-primary ml-2" disabled>Upload</button>
         </div>
 
         <div class="block">
@@ -120,7 +119,7 @@
 
         <div class="block">
           <div class="is-flex is-justify-content-center is-align-content-center">
-            <img id="displayed-image" src="ulrich-mareli.jpg">
+            <img id="displayed-image">
           </div>
         </div>
 
