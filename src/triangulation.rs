@@ -1,9 +1,7 @@
-//! Uses [Delaunay triangluation](https://en.wikipedia.org/wiki/Delaunay_triangulation) to
+//! Uses [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) to
 //! generate low-poly images.
 //!
 //! Approach based on https://cjqian.github.io/docs/tri_iw_paper.pdf
-
-use std::time::Instant;
 
 use crate::PolifyError;
 
@@ -13,9 +11,17 @@ use imageproc::definitions::HasBlack;
 use imageproc::definitions::HasWhite;
 use imageproc::drawing::draw_polygon_mut;
 use rand::seq::IteratorRandom;
+
+use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use wasm_mt::prelude::*;
+
+#[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
 
-/// A [`TriangulationConfig`] are the parameters that will affect the triangulation
+#[wasm_bindgen]
+/// A [`TriangulationConfig`] is the parameters that will affect the triangulation
 /// algorithm's output.
 pub struct TriangulationConfig {
     /// The maximum number of vertices we want.
@@ -43,11 +49,18 @@ pub struct TriangulationConfig {
 
 /// A pre-processed image.
 #[derive(Debug, Clone)]
-pub struct PreprocessedImage(GrayImage);
+pub struct PreprocessedImage {
+    /// A black and white image.
+    pub image: GrayImage,
+}
+
+#[wasm_bindgen]
 
 /// A list of nodes.
 #[derive(Debug, Clone)]
-pub struct NodeList(Vec<delaunator::Point>);
+pub struct NodeList {
+    list: Vec<delaunator::Point>,
+}
 
 /// Returns a low-poly [`DynamicImage`] via the triangulation method.
 ///
@@ -65,11 +78,11 @@ pub fn triangulate_image(
 
     let preprocessed_image: PreprocessedImage =
         preprocess_image(image, config.low_threshold, config.high_threshold)?;
-    let (width, height) = preprocessed_image.0.dimensions();
+    let (width, height) = preprocessed_image.image.dimensions();
 
     // Next, node detection.
     let node_list = node_detection(
-        preprocessed_image,
+        &preprocessed_image,
         config.max_vertices,
         config.edge_threshold,
     );
@@ -98,14 +111,16 @@ pub fn preprocess_image(
         ));
     }
 
-    Ok(PreprocessedImage(canny(
-        image
-            .grayscale()
-            .as_luma8()
-            .ok_or(crate::error::PolifyError::LumaConversion)?,
-        low_threshold,
-        high_threshold,
-    )?))
+    Ok(PreprocessedImage {
+        image: canny(
+            image
+                .grayscale()
+                .as_luma8()
+                .ok_or(crate::error::PolifyError::LumaConversion)?,
+            low_threshold,
+            high_threshold,
+        )?,
+    })
 }
 
 fn canny(
@@ -122,6 +137,26 @@ fn canny(
 
     let (width, height) = image.dimensions();
 
+    #[cfg(target_arch = "wasm32")]
+    let blurred_image: ImageBuffer<Luma<f32>, Vec<f32>> = ImageBuffer::from_vec(
+        width,
+        height,
+        (0..width)
+            .map(|i| {
+                (0..height).map(move |j| {
+                    let h: f32 = (max(0, i - BLUR)..min(width - 1, i + BLUR))
+                        .map(|x| image.get_pixel(x, j).0[0] as f32 / (2 * BLUR) as f32)
+                        .sum();
+
+                    h / (2.0 * RATE)
+                })
+            })
+            .flatten()
+            .collect::<Vec<_>>(),
+    )
+    .ok_or(crate::error::PolifyError::PreProcessing)?;
+
+    #[cfg(not(target_arch = "wasm32"))]
     let blurred_image: ImageBuffer<Luma<f32>, Vec<f32>> = ImageBuffer::from_vec(
         width,
         height,
@@ -196,14 +231,14 @@ fn hysteresis(
 
 /// Detects nodes in a pre-processed image.
 pub fn node_detection(
-    preprocessed_image: PreprocessedImage,
+    preprocessed_image: &PreprocessedImage,
     max_vertices: u32,
     edge_threshold: f64,
 ) -> NodeList {
     use std::cmp::{max, min};
 
     let mut rng = rand::thread_rng();
-    let (width, height) = preprocessed_image.0.dimensions();
+    let (width, height) = preprocessed_image.image.dimensions();
 
     let mut node_list: Vec<delaunator::Point> = vec![];
 
@@ -212,7 +247,7 @@ pub fn node_detection(
             let sum_of_pixels: f64 = (max(0, i - 1)..min(width - 1, i + 1))
                 .map(|x| {
                     (max(0, j - 1)..min(height - 1, j + 1))
-                        .map(|y| preprocessed_image.0.get_pixel(x, y).0[0] as u32)
+                        .map(|y| preprocessed_image.image.get_pixel(x, y).0[0] as u32)
                         .sum::<u32>()
                 })
                 .sum::<u32>() as f64;
@@ -245,7 +280,7 @@ pub fn node_detection(
         y: height as f64 - 1.0,
     });
 
-    NodeList(node_list)
+    NodeList { list: node_list }
 }
 
 /// Triangulates points given a node list.
@@ -256,7 +291,7 @@ pub fn triangulation(
     height: u32,
 ) -> crate::error::Result<DynamicImage> {
     // ...because why write our own?
-    let triangulation = triangulate(&node_list.0).ok_or(PolifyError::Triangulation)?;
+    let triangulation = triangulate(&node_list.list).ok_or(PolifyError::Triangulation)?;
 
     // Now let's convert the triangulation into an image.
     let mut img = RgbImage::new(width, height);
@@ -269,9 +304,9 @@ pub fn triangulation(
         assert!(points.len() == 3);
 
         let pixels = (
-            &node_list.0[points[0]],
-            &node_list.0[points[1]],
-            &node_list.0[points[2]],
+            &node_list.list[points[0]],
+            &node_list.list[points[1]],
+            &node_list.list[points[2]],
         );
 
         // Center of gravity in triangle...

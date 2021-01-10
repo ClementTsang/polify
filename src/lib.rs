@@ -8,7 +8,9 @@
 pub mod error;
 pub mod image;
 pub mod triangulation;
+pub mod wasm_triangulation;
 
 pub use crate::image::*;
 pub use error::*;
 pub use triangulation::*;
+pub use wasm_triangulation::*;
