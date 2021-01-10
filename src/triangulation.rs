@@ -14,8 +14,7 @@ use rand::seq::IteratorRandom;
 
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-use wasm_mt::prelude::*;
+// #[cfg(target_arch = "wasm32")]
 
 #[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;

@@ -1,6 +1,11 @@
 //! API to load an image in the first place.
 
-use image::{io::Reader as ImageReader, DynamicImage};
+#[cfg(not(target_arch = "wasm32"))]
+use image::io::Reader as ImageReader;
+
+use image::DynamicImage;
+
+#[cfg(not(target_arch = "wasm32"))]
 use std::path::Path;
 
 #[cfg(not(target_arch = "wasm32"))]

@@ -3,13 +3,15 @@ name = "polify"
 version = "0.1.0"
 authors = ["ClementTsang <clementjhtsang@gmail.com>"]
 edition = "2018"
+description = "A WebAssembly-compatible crate to create polygon art from images based on Delaunay triangulation."
+license = "MIT"
+repository = "https://github.com/ClementTsang/polify"
 
 [dependencies]
 image = { version = "0.23.12", default-features = false, features = [ "gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr", "dxt", "dds", "farbfeld" ] } 
 thiserror = "1.0"
-imageproc = "0.22.0"
-rand = "0.8"
 delaunator = "0.2.0"
+rand = "0.8"
 
 futures = "0.1"
 wasm-bindgen = "0.2"
@@ -20,8 +22,11 @@ web-sys = { version = "0.3", features = [ "Headers", "WorkerGlobalScope", "Respo
 # For normal usage
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rayon = "1.5.0"
+imageproc = "0.22.0"
 
-# [target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+imageproc = { version = "0.22.0", default-features = false }
+getrandom = { version = "0.2.1", features = ["js"] }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
