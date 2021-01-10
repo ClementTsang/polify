@@ -20,7 +20,7 @@ use wasm_bindgen::prelude::*;
 use rayon::prelude::*;
 
 #[wasm_bindgen]
-/// A [`TriangulationConfig`] is the parameters that will affect the triangulation
+/// A `TriangulationConfig` is the parameters that will affect the triangulation
 /// algorithm's output.
 pub struct TriangulationConfig {
     /// The maximum number of vertices we want.
@@ -46,6 +46,24 @@ pub struct TriangulationConfig {
     pub high_threshold: f32,
 }
 
+#[wasm_bindgen]
+impl TriangulationConfig {
+    /// Creates a new `TriangulationConfig`.
+    pub fn new(
+        max_vertices: u32,
+        edge_threshold: f64,
+        low_threshold: f32,
+        high_threshold: f32,
+    ) -> Self {
+        Self {
+            max_vertices,
+            edge_threshold,
+            low_threshold,
+            high_threshold,
+        }
+    }
+}
+
 /// A pre-processed image.
 #[derive(Debug, Clone)]
 pub struct PreprocessedImage {
@@ -54,7 +72,6 @@ pub struct PreprocessedImage {
 }
 
 #[wasm_bindgen]
-
 /// A list of nodes.
 #[derive(Debug, Clone)]
 pub struct NodeList {

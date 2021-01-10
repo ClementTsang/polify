@@ -31,3 +31,9 @@ pub enum PolifyError {
 
 /// A `Result` type with a [`PolifyError`].
 pub type Result<T> = std::result::Result<T, PolifyError>;
+
+impl From<PolifyError> for wasm_bindgen::JsValue {
+    fn from(err: PolifyError) -> Self {
+        wasm_bindgen::JsValue::from_str(err.to_string().as_str())
+    }
+}
