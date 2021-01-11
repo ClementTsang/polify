@@ -94,7 +94,6 @@ pub fn triangulate_image(
 
     let preprocessed_image: PreprocessedImage =
         preprocess_image(image, config.low_threshold, config.high_threshold)?;
-    let (width, height) = preprocessed_image.image.dimensions();
 
     // Next, node detection.
     let node_list = node_detection(
@@ -104,7 +103,7 @@ pub fn triangulate_image(
     );
 
     // Lastly, triangulation.
-    Ok(triangulation(node_list, image, width, height)?)
+    Ok(triangulation(image, node_list)?)
 }
 
 /// Preprocesses the image.
@@ -301,19 +300,18 @@ pub fn node_detection(
 
 /// Triangulates points given a node list.
 pub fn triangulation(
-    node_list: NodeList,
     image: &DynamicImage,
-    width: u32,
-    height: u32,
+    node_list: NodeList,
 ) -> crate::error::Result<DynamicImage> {
     // ...because why write our own?
     let triangulation = triangulate(&node_list.list).ok_or(PolifyError::Triangulation)?;
 
     // Now let's convert the triangulation into an image.
-    let mut img = RgbImage::new(width, height);
     let rgb_img = image
         .as_rgb8()
         .ok_or(crate::error::PolifyError::RgbConversion)?;
+    let (width, height) = rgb_img.dimensions();
+    let mut img = RgbImage::new(width, height);
     let consecutive_slices = consecutive_slices(&triangulation.triangles, 3);
     for points in consecutive_slices {
         // Assert should hopefully mean we optimize out bounds check...

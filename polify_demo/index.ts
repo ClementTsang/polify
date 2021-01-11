@@ -1,19 +1,27 @@
-// @ts-ignore
 import * as polify from "polify";
 // @ts-ignore
 import defaultImage from "./public/ulrich-mareli.jpg";
 
+// @ts-ignore
+import Worker from "worker-loader!./build.worker";
+
 class PolifyDemo {
   isUsingPaste: boolean;
   isProcessing: boolean;
+  isError: boolean;
   polifyConfig: polify.TriangulationConfig;
   imageObjectUrl: string | null;
   polyObjectUrl: string | null;
+  preprocessedImage: polify.WasmPreprocessedImage | null;
+  workingImage: polify.WasmImage | null;
 
   constructor() {
     this.isUsingPaste = true;
     this.isProcessing = false;
     this.polyObjectUrl = null;
+    this.isError = false;
+    this.preprocessedImage = null;
+    this.workingImage = null;
     this.imageObjectUrl = defaultImage;
 
     const pasteImageTab = document.getElementById("paste-image");
@@ -121,19 +129,19 @@ class PolifyDemo {
     ) as HTMLInputElement;
 
     maxVerticesSlider.onmouseup = () => {
-      const newValue = parseInt(maxVerticesSlider.value);
+      this.polifyConfig.max_vertices = parseInt(maxVerticesSlider.value);
     };
 
     edgeThresholdSlider.onmouseup = () => {
-      const newValue = parseFloat(edgeThresholdSlider.value);
+      this.polifyConfig.edge_threshold = parseFloat(edgeThresholdSlider.value);
     };
 
     highThresholdSlider.onmouseup = () => {
-      const newValue = parseFloat(highThresholdSlider.value);
+      this.polifyConfig.high_threshold = parseFloat(highThresholdSlider.value);
     };
 
     lowThresholdSlider.onmouseup = () => {
-      const newValue = parseFloat(lowThresholdSlider.value);
+      this.polifyConfig.low_threshold = parseFloat(lowThresholdSlider.value);
     };
 
     this.polifyConfig = polify.TriangulationConfig.new(
@@ -143,24 +151,10 @@ class PolifyDemo {
       parseFloat(highThresholdSlider.value)
     );
 
-    const imageUrl: string = document
-      .getElementById("displayed-image")
-      .getAttribute("src");
-    console.log("imageUrl: " + imageUrl);
-
-    const workingImage: polify.WorkingImage = new polify.WorkingImage(imageUrl);
-    polify
-      .wasm_triangulate_image(workingImage, this.polifyConfig)
-      .then((resp: Response) => {
-        resp.blob().then((blob) => {
-          this.polyObjectUrl = URL.createObjectURL(blob);
-        });
-      })
-      .catch((err: Error) => {
-        console.error("Error while triangulating: " + err);
-      });
-
     const polifySwitch = document.getElementById("polify-switch");
+    const progressBar = document.getElementById(
+      "progress-bar"
+    ) as HTMLProgressElement;
     polifySwitch.addEventListener("click", () => {
       if (polifySwitch.hasAttribute("checked")) {
         polifySwitch.removeAttribute("checked");
@@ -170,6 +164,8 @@ class PolifyDemo {
         highThresholdSlider.setAttribute("disabled", "disabled");
         lowThresholdSlider.setAttribute("disabled", "disabled");
 
+        displayedImage.style.display = "block";
+        progressBar.style.display = "none";
         displayedImage.src = this.imageObjectUrl;
       } else {
         polifySwitch.setAttribute("checked", "checked");
@@ -179,9 +175,113 @@ class PolifyDemo {
         highThresholdSlider.removeAttribute("disabled");
         lowThresholdSlider.removeAttribute("disabled");
 
-        displayedImage.src = this.polyObjectUrl;
+        if (this.isProcessing) {
+          displayedImage.style.display = "none";
+          progressBar.style.display = "block";
+        } else {
+          displayedImage.style.display = "block";
+          progressBar.style.display = "none";
+          displayedImage.src = this.polyObjectUrl;
+        }
       }
     });
+
+    this.buildImage();
+
+    console.log("Ctor done.");
+  }
+
+  // preprocessImage(): polify.WasmPreprocessedImage | null {
+  //   console.log("Called preprocess.");
+
+  //   const imageUrl: string = document
+  //     .getElementById("displayed-image")
+  //     .getAttribute("src");
+
+  //   console.log("imageUrl: " + imageUrl);
+
+  //   if (this.workingImage !== null) {
+  //     this.workingImage.free();
+  //   }
+
+  //   this.workingImage = new polify.WasmImage(imageUrl);
+  //   const tempWorkingImage = new polify.WasmImage(imageUrl);
+  //   try {
+  //     if (this.workingImage !== null) {
+  //       let preprocessedImage = new polify.WasmPreprocessedImage(
+  //         tempWorkingImage,
+  //         this.polifyConfig.low_threshold,
+  //         this.polifyConfig.high_threshold
+  //       );
+
+  //       console.log("Returning preprocessed image...");
+
+  //       return preprocessedImage;
+  //     } else {
+  //       console.error("workingImage was null...?");
+  //     }
+  //   } catch (err: any) {
+  //     console.error("Error while preprocessing: " + err);
+  //   }
+
+  //   return null;
+  // }
+
+  // updateImage(): polify.WasmImage | null {
+  //   console.log("Called update.");
+
+  //   if (this.preprocessedImage !== null && this.workingImage !== null) {
+  //     try {
+  //       console.log("Returning updated image.");
+
+  //       return this.workingImage.wasm_triangulation(
+  //         this.preprocessedImage,
+  //         this.polifyConfig.max_vertices,
+  //         this.polifyConfig.edge_threshold
+  //       );
+  //     } catch (err: any) {
+  //       console.error("Error while updating: " + err);
+  //     }
+  //   } else {
+  //     console.error("Either preprocessedImage or workingImage were null...");
+  //   }
+
+  //   return null;
+  // }
+
+  buildImage() {
+    console.log("Building image...");
+    this.isProcessing = true;
+    this.isError = false;
+
+    const imageUrl: string = document
+      .getElementById("displayed-image")
+      .getAttribute("src");
+
+    const worker = new Worker();
+    console.log("image sent: " + JSON.stringify(imageUrl));
+
+    worker.postMessage([
+      imageUrl,
+      this.polifyConfig.edge_threshold,
+      this.polifyConfig.high_threshold,
+      this.polifyConfig.low_threshold,
+      this.polifyConfig.max_vertices,
+    ]);
+
+    worker.onmessage = (e: any) => {
+      console.log("Received message from worker");
+
+      if (e.data !== null) {
+        this.polyObjectUrl = e.data;
+      } else {
+        console.error("Something went wrong with the worker...");
+        this.isError = true;
+      }
+
+      this.isProcessing = false;
+      console.log("Done.");
+    };
   }
 }
 

@@ -1,26 +1,8 @@
 # Polify
 
-WIP
+Low-poly image generator library. Written in Rust, with some WebAssembly support. Demo [here](https://clementtsang.github.io/polify/).
 
----
-
-Low-poly image generator library. Written in Rust, with planned WebAssembly support.
-
-## Usage of library
-
-If you wish to use the library, simply just import it into Cargo.toml:
-
-```toml
-
-```
-
-Documentation for the library can be found [here]().
-
-## Demo
-
-WIP, subject to change as improvements come along!
-
----
+## Example output
 
 An image of a husky from [Erik Mclean](https://unsplash.com/photos/0P3M35GDyk8):
 

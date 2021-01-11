@@ -27,6 +27,7 @@ imageproc = "0.22.0"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 imageproc = { version = "0.22.0", default-features = false }
 getrandom = { version = "0.2.1", features = ["js"] }
+wee_alloc = "0.4.5"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
