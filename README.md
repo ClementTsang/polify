@@ -1,8 +1,10 @@
 # Polify
 
-Low-poly image generator library. Written in Rust, with some WebAssembly support. Demo [here](https://clementtsang.github.io/polify/).
+Low-poly image generator library. Written in Rust, with some WebAssembly support. WIP demo [here](https://clementtsang.github.io/polify/).
 
 ## Example output
+
+Note results may be subject to change, I'm still trying to improve it, particularily the edges of triangles.
 
 An image of a husky from [Erik Mclean](https://unsplash.com/photos/0P3M35GDyk8):
 
