@@ -14,6 +14,8 @@ class PolifyDemo {
   polyObjectUrl: string | null;
   preprocessedImage: polify.WasmPreprocessedImage | null;
   workingImage: polify.WasmImage | null;
+  showPoly: boolean;
+  imageBlob: any;
 
   constructor() {
     this.isUsingPaste = true;
@@ -23,6 +25,46 @@ class PolifyDemo {
     this.preprocessedImage = null;
     this.workingImage = null;
     this.imageObjectUrl = defaultImage;
+    this.showPoly = false;
+    this.imageBlob = null;
+
+    const maxVerticesSlider: HTMLInputElement = document.getElementById(
+      "max-vertices"
+    ) as HTMLInputElement;
+    const edgeThresholdSlider: HTMLInputElement = document.getElementById(
+      "edge-threshold"
+    ) as HTMLInputElement;
+    const highThresholdSlider: HTMLInputElement = document.getElementById(
+      "high-threshold"
+    ) as HTMLInputElement;
+    const lowThresholdSlider: HTMLInputElement = document.getElementById(
+      "low-threshold"
+    ) as HTMLInputElement;
+
+    maxVerticesSlider.onmouseup = () => {
+      this.polifyConfig.max_vertices = parseInt(maxVerticesSlider.value);
+    };
+
+    edgeThresholdSlider.onmouseup = () => {
+      this.polifyConfig.edge_threshold = parseFloat(edgeThresholdSlider.value);
+    };
+
+    highThresholdSlider.onmouseup = () => {
+      this.polifyConfig.high_threshold = parseFloat(highThresholdSlider.value);
+    };
+
+    lowThresholdSlider.onmouseup = () => {
+      this.polifyConfig.low_threshold = parseFloat(lowThresholdSlider.value);
+    };
+
+    this.polifyConfig = polify.TriangulationConfig.new(
+      parseFloat(maxVerticesSlider.value),
+      parseFloat(edgeThresholdSlider.value),
+      parseFloat(lowThresholdSlider.value),
+      parseFloat(highThresholdSlider.value)
+    );
+
+    this.buildImage();
 
     const pasteImageTab = document.getElementById("paste-image");
     const uploadImageTab = document.getElementById("upload-image");
@@ -115,50 +157,16 @@ class PolifyDemo {
       }
     });
 
-    const maxVerticesSlider: HTMLInputElement = document.getElementById(
-      "max-vertices"
+    const polifySwitch = document.getElementById(
+      "polify-switch"
     ) as HTMLInputElement;
-    const edgeThresholdSlider: HTMLInputElement = document.getElementById(
-      "edge-threshold"
-    ) as HTMLInputElement;
-    const highThresholdSlider: HTMLInputElement = document.getElementById(
-      "high-threshold"
-    ) as HTMLInputElement;
-    const lowThresholdSlider: HTMLInputElement = document.getElementById(
-      "low-threshold"
-    ) as HTMLInputElement;
-
-    maxVerticesSlider.onmouseup = () => {
-      this.polifyConfig.max_vertices = parseInt(maxVerticesSlider.value);
-    };
-
-    edgeThresholdSlider.onmouseup = () => {
-      this.polifyConfig.edge_threshold = parseFloat(edgeThresholdSlider.value);
-    };
-
-    highThresholdSlider.onmouseup = () => {
-      this.polifyConfig.high_threshold = parseFloat(highThresholdSlider.value);
-    };
-
-    lowThresholdSlider.onmouseup = () => {
-      this.polifyConfig.low_threshold = parseFloat(lowThresholdSlider.value);
-    };
-
-    this.polifyConfig = polify.TriangulationConfig.new(
-      parseFloat(maxVerticesSlider.value),
-      parseFloat(edgeThresholdSlider.value),
-      parseFloat(lowThresholdSlider.value),
-      parseFloat(highThresholdSlider.value)
-    );
-
-    const polifySwitch = document.getElementById("polify-switch");
-    polifySwitch.removeAttribute("checked");
+    polifySwitch.checked = false;
     const progressBar = document.getElementById(
       "progress-bar"
     ) as HTMLProgressElement;
     polifySwitch.addEventListener("click", () => {
-      if (polifySwitch.hasAttribute("checked")) {
-        polifySwitch.removeAttribute("checked");
+      if (!polifySwitch.checked) {
+        this.showPoly = false;
 
         maxVerticesSlider.setAttribute("disabled", "disabled");
         edgeThresholdSlider.setAttribute("disabled", "disabled");
@@ -169,7 +177,7 @@ class PolifyDemo {
         progressBar.style.display = "none";
         displayedImage.src = this.imageObjectUrl;
       } else {
-        polifySwitch.setAttribute("checked", "checked");
+        this.showPoly = true;
 
         maxVerticesSlider.removeAttribute("disabled");
         edgeThresholdSlider.removeAttribute("disabled");
@@ -186,10 +194,6 @@ class PolifyDemo {
         }
       }
     });
-
-    this.buildImage();
-
-    console.log("Ctor done.");
   }
 
   // preprocessImage(): polify.WasmPreprocessedImage | null {
@@ -255,9 +259,7 @@ class PolifyDemo {
     this.isProcessing = true;
     this.isError = false;
 
-    const imageUrl: string = document
-      .getElementById("displayed-image")
-      .getAttribute("src");
+    const imageUrl: string = this.imageObjectUrl;
 
     const worker = new Worker();
     console.log("image sent: " + JSON.stringify(imageUrl));
@@ -274,7 +276,8 @@ class PolifyDemo {
       console.log("Received message from worker");
 
       if (e.data !== null) {
-        this.polyObjectUrl = e.data;
+        this.imageBlob = e.data;
+        this.polyObjectUrl = URL.createObjectURL(this.imageBlob);
 
         const displayedImage: HTMLImageElement = document.getElementById(
           "displayed-image"
@@ -284,9 +287,11 @@ class PolifyDemo {
           "progress-bar"
         ) as HTMLProgressElement;
 
-        displayedImage.style.display = "block";
-        progressBar.style.display = "none";
-        displayedImage.src = this.polyObjectUrl;
+        if (this.showPoly) {
+          displayedImage.style.display = "block";
+          progressBar.style.display = "none";
+          displayedImage.src = this.polyObjectUrl;
+        }
       } else {
         console.error("Something went wrong with the worker...");
         this.isError = true;

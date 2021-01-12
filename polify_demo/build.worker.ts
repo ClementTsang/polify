@@ -3,7 +3,7 @@ const ctx: Worker = self as any;
 ctx.addEventListener("message", (event) => {
   console.log("Worker starting up.");
 
-  let polyObjectUrl: any = null;
+  let polyBlob: any = null;
 
   import("polify")
     .then((polify) => {
@@ -21,6 +21,7 @@ ctx.addEventListener("message", (event) => {
         polifyConfig.low_threshold,
         polifyConfig.high_threshold
       );
+      console.log("Preprocessing.");
 
       workingImage
         .wasm_triangulation(
@@ -30,25 +31,27 @@ ctx.addEventListener("message", (event) => {
         )
         .build()
         .then((resp: Response) => {
+          console.log("resp");
           resp
             .blob()
             .then((blob: Object) => {
-              polyObjectUrl = URL.createObjectURL(blob);
+              console.log("blob");
+              polyBlob = blob;
             })
             .catch((err: any) => {
               console.error("Error while opening blob:" + err);
             })
             .finally(() => {
-              ctx.postMessage(polyObjectUrl);
+              ctx.postMessage(polyBlob);
             });
         })
         .catch((err: any) => {
           console.error("Error while building image: " + err);
-          ctx.postMessage(polyObjectUrl);
+          ctx.postMessage(polyBlob);
         });
     })
     .catch((err: any) => {
       console.error("Error while importing polify: " + err);
-      ctx.postMessage(polyObjectUrl);
+      ctx.postMessage(polyBlob);
     });
 });
