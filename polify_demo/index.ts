@@ -274,6 +274,18 @@ class PolifyDemo {
 
       if (e.data !== null) {
         this.polyObjectUrl = e.data;
+
+        const displayedImage: HTMLImageElement = document.getElementById(
+          "displayed-image"
+        ) as HTMLImageElement;
+
+        const progressBar = document.getElementById(
+          "progress-bar"
+        ) as HTMLProgressElement;
+
+        displayedImage.style.display = "block";
+        progressBar.style.display = "none";
+        displayedImage.src = this.polyObjectUrl;
       } else {
         console.error("Something went wrong with the worker...");
         this.isError = true;
