@@ -152,6 +152,7 @@ class PolifyDemo {
     );
 
     const polifySwitch = document.getElementById("polify-switch");
+    polifySwitch.removeAttribute("checked");
     const progressBar = document.getElementById(
       "progress-bar"
     ) as HTMLProgressElement;
