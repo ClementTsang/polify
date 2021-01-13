@@ -106,6 +106,9 @@ class PolifyDemo {
         this.imageObjectUrl = window.URL.createObjectURL(file);
         if (!this.showPoly) {
           displayedImage.src = this.imageObjectUrl;
+        } else {
+          displayedImage.style.display = "none";
+          progressBar.style.display = "block";
         }
 
         this.buildImage();
@@ -130,6 +133,9 @@ class PolifyDemo {
         this.imageObjectUrl = pasteImageInput.value;
         if (!this.showPoly) {
           displayedImage.src = this.imageObjectUrl;
+        } else {
+          displayedImage.style.display = "none";
+          progressBar.style.display = "block";
         }
 
         this.buildImage();
@@ -160,6 +166,9 @@ class PolifyDemo {
 
           if (!this.showPoly) {
             displayedImage.src = this.imageObjectUrl;
+          } else {
+            displayedImage.style.display = "none";
+            progressBar.style.display = "block";
           }
 
           this.buildImage();
