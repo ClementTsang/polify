@@ -29,6 +29,10 @@ ctx.addEventListener("message", (event) => {
           let resp: Response = polyImage.build();
           let polyBlob: any = null;
 
+          preprocessedImage.free();
+          polyImage.free();
+          workingImage.free();
+
           if (resp.ok) {
             resp
               .blob()
