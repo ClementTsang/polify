@@ -34,37 +34,33 @@ class PolifyDemo {
     const edgeThresholdSlider: HTMLInputElement = document.getElementById(
       "edge-threshold"
     ) as HTMLInputElement;
-    const highThresholdSlider: HTMLInputElement = document.getElementById(
-      "high-threshold"
-    ) as HTMLInputElement;
-    const lowThresholdSlider: HTMLInputElement = document.getElementById(
-      "low-threshold"
-    ) as HTMLInputElement;
 
     // Also forcefully reset values to stock.
-
-    maxVerticesSlider.onmouseup = () => {
-      this.polifyConfig.max_vertices = parseInt(maxVerticesSlider.value);
-    };
-
-    edgeThresholdSlider.onmouseup = () => {
-      this.polifyConfig.edge_threshold = parseFloat(edgeThresholdSlider.value);
-    };
-
-    highThresholdSlider.onmouseup = () => {
-      this.polifyConfig.high_threshold = parseFloat(highThresholdSlider.value);
-    };
-
-    lowThresholdSlider.onmouseup = () => {
-      this.polifyConfig.low_threshold = parseFloat(lowThresholdSlider.value);
-    };
+    maxVerticesSlider.value = "1000";
+    edgeThresholdSlider.value = "10.0";
 
     this.polifyConfig = polify.TriangulationConfig.new(
       parseFloat(maxVerticesSlider.value),
       parseFloat(edgeThresholdSlider.value),
-      parseFloat(lowThresholdSlider.value),
-      parseFloat(highThresholdSlider.value)
+      0.05,
+      5.0
     );
+
+    maxVerticesSlider.onmouseup = () => {
+      const newValue = parseInt(maxVerticesSlider.value);
+      if (this.polifyConfig.edge_threshold != newValue) {
+        this.polifyConfig.max_vertices = newValue;
+        this.buildImage();
+      }
+    };
+
+    edgeThresholdSlider.onmouseup = () => {
+      const newValue = parseFloat(edgeThresholdSlider.value);
+      if (this.polifyConfig.edge_threshold != newValue) {
+        this.polifyConfig.edge_threshold = newValue;
+        this.buildImage();
+      }
+    };
 
     this.buildImage();
 
@@ -139,6 +135,9 @@ class PolifyDemo {
         this.buildImage();
       }
     });
+    pasteImageInput.value = ""; // Init to be empty and disabled.
+    pasteImageButton.setAttribute("disabled", "");
+
     pasteImageInput.addEventListener("input", () => {
       if (pasteImageInput.value.length > 0) {
         pasteImageButton.removeAttribute("disabled");
@@ -194,7 +193,10 @@ class PolifyDemo {
           this.enableSliders();
           displayedImage.style.display = "block";
           progressBar.style.display = "none";
-          displayedImage.src = this.polyObjectUrl;
+
+          if (this.polyObjectUrl != null) {
+            displayedImage.src = this.polyObjectUrl;
+          }
         }
       }
     });
@@ -207,17 +209,9 @@ class PolifyDemo {
     const edgeThresholdSlider: HTMLInputElement = document.getElementById(
       "edge-threshold"
     ) as HTMLInputElement;
-    const highThresholdSlider: HTMLInputElement = document.getElementById(
-      "high-threshold"
-    ) as HTMLInputElement;
-    const lowThresholdSlider: HTMLInputElement = document.getElementById(
-      "low-threshold"
-    ) as HTMLInputElement;
 
     maxVerticesSlider.removeAttribute("disabled");
     edgeThresholdSlider.removeAttribute("disabled");
-    highThresholdSlider.removeAttribute("disabled");
-    lowThresholdSlider.removeAttribute("disabled");
   }
 
   disableSliders() {
@@ -227,17 +221,9 @@ class PolifyDemo {
     const edgeThresholdSlider: HTMLInputElement = document.getElementById(
       "edge-threshold"
     ) as HTMLInputElement;
-    const highThresholdSlider: HTMLInputElement = document.getElementById(
-      "high-threshold"
-    ) as HTMLInputElement;
-    const lowThresholdSlider: HTMLInputElement = document.getElementById(
-      "low-threshold"
-    ) as HTMLInputElement;
 
     maxVerticesSlider.setAttribute("disabled", "disabled");
     edgeThresholdSlider.setAttribute("disabled", "disabled");
-    highThresholdSlider.setAttribute("disabled", "disabled");
-    lowThresholdSlider.setAttribute("disabled", "disabled");
   }
 
   // preprocessImage(): polify.WasmPreprocessedImage | null {
@@ -346,7 +332,6 @@ class PolifyDemo {
       if (this.showPoly) {
         this.enableSliders();
       }
-      console.log("Done.");
     };
   }
 }

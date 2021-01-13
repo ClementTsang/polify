@@ -29,17 +29,22 @@ ctx.addEventListener("message", (event) => {
           let resp: Response = polyImage.build();
           let polyBlob: any = null;
 
-          resp
-            .blob()
-            .then((blob: Object) => {
-              polyBlob = blob;
-            })
-            .catch((err: any) => {
-              console.error("Error while opening blob:" + err);
-            })
-            .finally(() => {
-              ctx.postMessage(polyBlob);
-            });
+          if (resp.ok) {
+            resp
+              .blob()
+              .then((blob: Object) => {
+                polyBlob = blob;
+              })
+              .catch((err: any) => {
+                console.error("Error while opening blob:" + err);
+              })
+              .finally(() => {
+                ctx.postMessage(polyBlob);
+              });
+          } else {
+            console.error("Polify threw an error while building.");
+            ctx.postMessage(null);
+          }
         })
         .catch((err: any) => {
           console.error("Error while building image: " + err);

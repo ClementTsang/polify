@@ -72,24 +72,30 @@ impl WasmImage {
 
     /// Builds an image from a `WasmImage`.
     pub fn build(self) -> JsValue {
-        let response = self.image_box.and_then(move |info| {
-            // We'll use the same headers, but remove length
-            let headers = web_sys::Headers::new_with_headers(&info.headers)?;
-            headers.delete("Content-Length")?;
-            // Write to a buffer
-            let mut buf = Cursor::new(Vec::new());
-            info.image
-                .write_to(&mut buf, info.format)
-                .map_err(err_img_to_js)?;
+        let response = self
+            .image_box
+            .and_then(move |info| {
+                // We'll use the same headers, but remove length
+                let headers = web_sys::Headers::new_with_headers(&info.headers)?;
+                headers.delete("Content-Length")?;
+                // Write to a buffer
+                let mut buf = Cursor::new(Vec::new());
+                info.image
+                    .write_to(&mut buf, info.format)
+                    .map_err(err_img_to_js)?;
 
-            // Build the response
-            let body = js_sys::Uint8Array::from(buf.get_ref().as_slice());
-            let resp = web_sys::Response::new_with_opt_buffer_source_and_init(
-                Some(&body),
-                web_sys::ResponseInit::new().headers(&headers),
-            )?;
-            Ok(JsValue::from(resp))
-        });
+                // Build the response
+                let body = js_sys::Uint8Array::from(buf.get_ref().as_slice());
+                let resp = web_sys::Response::new_with_opt_buffer_source_and_init(
+                    Some(&body),
+                    web_sys::ResponseInit::new().headers(&headers),
+                )?;
+                Ok(JsValue::from(resp))
+            })
+            .or_else(|_err| {
+                let resp = web_sys::Response::error();
+                Ok(JsValue::from(resp))
+            });
 
         match response {
             Ok(resp) => resp,

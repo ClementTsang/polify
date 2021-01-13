@@ -21,9 +21,6 @@ pub enum PolifyError {
     /// An error during preproccessing.
     #[error("preprocessing failed")]
     PreProcessing,
-    /// An error during RGB conversion.
-    #[error("rgb conversion failed")]
-    RgbConversion,
     /// An error during Luma conversion.
     #[error("luma conversion failed")]
     LumaConversion,
@@ -34,6 +31,6 @@ pub type Result<T> = std::result::Result<T, PolifyError>;
 
 impl From<PolifyError> for wasm_bindgen::JsValue {
     fn from(err: PolifyError) -> Self {
-        wasm_bindgen::JsValue::from_str(err.to_string().as_str())
+        wasm_bindgen::JsValue::from(format!("Error: {}", err.to_string()))
     }
 }
