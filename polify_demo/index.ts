@@ -106,9 +106,11 @@ class PolifyDemo {
           URL.revokeObjectURL(this.imageObjectUrl);
         }
         this.imageObjectUrl = window.URL.createObjectURL(file);
-        displayedImage.src = this.imageObjectUrl;
+        if (!this.showPoly) {
+          displayedImage.src = this.imageObjectUrl;
+        }
 
-        // Call polify here...
+        this.buildImage();
       }
     };
 
@@ -128,10 +130,12 @@ class PolifyDemo {
           URL.revokeObjectURL(this.imageObjectUrl);
         }
         this.imageObjectUrl = pasteImageInput.value;
-        displayedImage.src = this.imageObjectUrl;
-      }
+        if (!this.showPoly) {
+          displayedImage.src = this.imageObjectUrl;
+        }
 
-      // Call polify here...
+        this.buildImage();
+      }
     });
     pasteImageInput.addEventListener("input", () => {
       if (pasteImageInput.value.length > 0) {
@@ -152,7 +156,12 @@ class PolifyDemo {
             URL.revokeObjectURL(this.imageObjectUrl);
           }
           this.imageObjectUrl = pasteImageInput.value;
-          displayedImage.src = this.imageObjectUrl;
+
+          if (!this.showPoly) {
+            displayedImage.src = this.imageObjectUrl;
+          }
+
+          this.buildImage();
         }
       }
     });
