@@ -168,10 +168,7 @@ class PolifyDemo {
       if (!polifySwitch.checked) {
         this.showPoly = false;
 
-        maxVerticesSlider.setAttribute("disabled", "disabled");
-        edgeThresholdSlider.setAttribute("disabled", "disabled");
-        highThresholdSlider.setAttribute("disabled", "disabled");
-        lowThresholdSlider.setAttribute("disabled", "disabled");
+        this.disableSliders();
 
         displayedImage.style.display = "block";
         progressBar.style.display = "none";
@@ -179,21 +176,57 @@ class PolifyDemo {
       } else {
         this.showPoly = true;
 
-        maxVerticesSlider.removeAttribute("disabled");
-        edgeThresholdSlider.removeAttribute("disabled");
-        highThresholdSlider.removeAttribute("disabled");
-        lowThresholdSlider.removeAttribute("disabled");
-
         if (this.isProcessing) {
           displayedImage.style.display = "none";
           progressBar.style.display = "block";
         } else {
+          this.enableSliders();
           displayedImage.style.display = "block";
           progressBar.style.display = "none";
           displayedImage.src = this.polyObjectUrl;
         }
       }
     });
+  }
+
+  enableSliders() {
+    const maxVerticesSlider: HTMLInputElement = document.getElementById(
+      "max-vertices"
+    ) as HTMLInputElement;
+    const edgeThresholdSlider: HTMLInputElement = document.getElementById(
+      "edge-threshold"
+    ) as HTMLInputElement;
+    const highThresholdSlider: HTMLInputElement = document.getElementById(
+      "high-threshold"
+    ) as HTMLInputElement;
+    const lowThresholdSlider: HTMLInputElement = document.getElementById(
+      "low-threshold"
+    ) as HTMLInputElement;
+
+    maxVerticesSlider.removeAttribute("disabled");
+    edgeThresholdSlider.removeAttribute("disabled");
+    highThresholdSlider.removeAttribute("disabled");
+    lowThresholdSlider.removeAttribute("disabled");
+  }
+
+  disableSliders() {
+    const maxVerticesSlider: HTMLInputElement = document.getElementById(
+      "max-vertices"
+    ) as HTMLInputElement;
+    const edgeThresholdSlider: HTMLInputElement = document.getElementById(
+      "edge-threshold"
+    ) as HTMLInputElement;
+    const highThresholdSlider: HTMLInputElement = document.getElementById(
+      "high-threshold"
+    ) as HTMLInputElement;
+    const lowThresholdSlider: HTMLInputElement = document.getElementById(
+      "low-threshold"
+    ) as HTMLInputElement;
+
+    maxVerticesSlider.setAttribute("disabled", "disabled");
+    edgeThresholdSlider.setAttribute("disabled", "disabled");
+    highThresholdSlider.setAttribute("disabled", "disabled");
+    lowThresholdSlider.setAttribute("disabled", "disabled");
   }
 
   // preprocessImage(): polify.WasmPreprocessedImage | null {
@@ -258,6 +291,7 @@ class PolifyDemo {
     console.log("Building image...");
     this.isProcessing = true;
     this.isError = false;
+    this.disableSliders();
 
     const imageUrl: string = this.imageObjectUrl;
 
@@ -298,11 +332,15 @@ class PolifyDemo {
       }
 
       this.isProcessing = false;
+      if (this.showPoly) {
+        this.enableSliders();
+      }
       console.log("Done.");
     };
   }
 }
 
+console.log("Initializing.");
 // @ts-ignore
 bulmaSlider.attach();
 new PolifyDemo();
