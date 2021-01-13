@@ -46,7 +46,7 @@ class PolifyDemo {
       5.0
     );
 
-    maxVerticesSlider.onmouseup = () => {
+    const updateMaxVertices = () => {
       const newValue = parseInt(maxVerticesSlider.value);
       if (this.polifyConfig.edge_threshold != newValue) {
         this.polifyConfig.max_vertices = newValue;
@@ -59,8 +59,7 @@ class PolifyDemo {
         this.buildImage();
       }
     };
-
-    edgeThresholdSlider.onmouseup = () => {
+    const updateEdgeThreshold = () => {
       const newValue = parseFloat(edgeThresholdSlider.value);
       if (this.polifyConfig.edge_threshold != newValue) {
         this.polifyConfig.edge_threshold = newValue;
@@ -73,6 +72,12 @@ class PolifyDemo {
         this.buildImage();
       }
     };
+
+    maxVerticesSlider.onmouseup = updateMaxVertices;
+    maxVerticesSlider.ontouchend = updateMaxVertices;
+
+    edgeThresholdSlider.onmouseup = updateEdgeThreshold;
+    edgeThresholdSlider.ontouchend = updateEdgeThreshold;
 
     this.buildImage();
 
