@@ -50,6 +50,12 @@ class PolifyDemo {
       const newValue = parseInt(maxVerticesSlider.value);
       if (this.polifyConfig.edge_threshold != newValue) {
         this.polifyConfig.max_vertices = newValue;
+
+        if (this.showPoly) {
+          displayedImage.style.display = "none";
+          progressBar.style.display = "block";
+        }
+
         this.buildImage();
       }
     };
@@ -58,6 +64,12 @@ class PolifyDemo {
       const newValue = parseFloat(edgeThresholdSlider.value);
       if (this.polifyConfig.edge_threshold != newValue) {
         this.polifyConfig.edge_threshold = newValue;
+
+        if (this.showPoly) {
+          displayedImage.style.display = "none";
+          progressBar.style.display = "block";
+        }
+
         this.buildImage();
       }
     };
@@ -299,6 +311,15 @@ class PolifyDemo {
     this.isError = false;
     this.disableSliders();
 
+    const displayedImage: HTMLImageElement = document.getElementById(
+      "displayed-image"
+    ) as HTMLImageElement;
+
+    displayedImage.src = this.imageObjectUrl;
+    if (this.polyObjectUrl != null) {
+      URL.revokeObjectURL(this.polyObjectUrl);
+    }
+
     const imageUrl: string = this.imageObjectUrl;
 
     const worker = new Worker();
@@ -319,10 +340,6 @@ class PolifyDemo {
         this.imageBlob = e.data;
         this.polyObjectUrl = URL.createObjectURL(this.imageBlob);
 
-        const displayedImage: HTMLImageElement = document.getElementById(
-          "displayed-image"
-        ) as HTMLImageElement;
-
         const progressBar = document.getElementById(
           "progress-bar"
         ) as HTMLProgressElement;
@@ -341,6 +358,9 @@ class PolifyDemo {
       if (this.showPoly) {
         this.enableSliders();
       }
+
+      console.log("Terminating worker.  Bye-bye!");
+      worker.terminate();
     };
   }
 }
