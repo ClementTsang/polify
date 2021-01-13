@@ -307,9 +307,7 @@ pub fn triangulation(
     let triangulation = triangulate(&node_list.list).ok_or(PolifyError::Triangulation)?;
 
     // Now let's convert the triangulation into an image.
-    let rgb_img = image
-        .as_rgb8()
-        .ok_or(crate::error::PolifyError::RgbConversion)?;
+    let rgb_img = image.clone().into_rgba8();
     let (width, height) = rgb_img.dimensions();
     let mut img = RgbImage::new(width, height);
     let consecutive_slices = consecutive_slices(&triangulation.triangles, 3);

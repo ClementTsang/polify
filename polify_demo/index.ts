@@ -41,6 +41,8 @@ class PolifyDemo {
       "low-threshold"
     ) as HTMLInputElement;
 
+    // Also forcefully reset values to stock.
+
     maxVerticesSlider.onmouseup = () => {
       this.polifyConfig.max_vertices = parseInt(maxVerticesSlider.value);
     };

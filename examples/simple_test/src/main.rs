@@ -18,7 +18,7 @@ fn main() {
     );
 
     let start = Instant::now();
-    triangulate_image("./anton-lecock.jpg", "./rocks.png");
+    triangulate_image("./anton-lecock.png", "./rocks.png");
     println!(
         "Image 3 took {} ms",
         Instant::now().duration_since(start).as_millis()
