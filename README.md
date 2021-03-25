@@ -2,6 +2,8 @@
 
 Low-poly image generator library. Written in Rust, with some WebAssembly support. WIP demo [here](https://clementtsang.github.io/polify/).
 
+The `polify_image` algorithm is heavily based on [this](https://cjqian.github.io/docs/tri_iw_paper.pdf) paper by Crystal J. Qian.
+
 ## Example output
 
 Note results may be subject to change, I'm still trying to improve it, particularily the edges of triangles.
@@ -28,4 +30,4 @@ Another [picture of mountains, by Anton Lecock](https://unsplash.com/photos/-EJE
 
 - To all the photographers whose art I used for demos.
 
-- `polify_image` algorithm heavily based on [this](https://cjqian.github.io/docs/tri_iw_paper.pdf) paper by Crystal J. Qian.
+- Another mention of the [paper](https://cjqian.github.io/docs/tri_iw_paper.pdf) by Crystal J. Qian for the algorithm used for image generation.
