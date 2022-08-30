@@ -9,13 +9,6 @@ use wasm_bindgen_futures::{future_to_promise, JsFuture};
 
 use crate::triangulation::*;
 
-#[cfg(target_arch = "wasm32")]
-extern crate wee_alloc;
-
-#[cfg(target_arch = "wasm32")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
-
 /// A WebAssembly-compatible struct to work with images.
 #[wasm_bindgen]
 pub struct WasmImage {
