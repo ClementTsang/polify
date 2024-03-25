@@ -1,92 +1,97 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Polify</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.0/dist/css/bulma-slider.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.0/dist/css/bulma-switch.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.4/dist/js/bulma-slider.min.js"></script>
 
-    <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" defer></script>
-    <script src="./bootstrap.js"></script>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Polify</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.0/dist/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.0/dist/css/bulma-switch.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.4/dist/js/bulma-slider.min.js"></script>
 
-  </head>
-  <body>
-    <section class="section">
-      <div class="container">
-        <h1 class="title is-2">
-          Polify
-        </h1>
-        <p class="subtitle">
-          A demo site for the <a href="https://github.com/ClementTsang/polify">Polify</a> library.
-        </p>
+  <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" defer></script>
+  <script src="./bootstrap.js"></script>
 
-        <div class="tabs ">
-          <ul>
-            <li class="is-active" id="paste-image"><a>Paste image URL</a></li>
-            <li id="upload-image"><a>Upload an Image</a></li>
-          </ul>
-        </div>
+</head>
 
-        <div class="is-flex is-flex-direction-row" id="paste-image-action">
-          <input class="input is-primary" placeholder="https://images.unsplash.com/photo-1608692702444-3ff552418fb0"></input>
-          <button class="button is-primary ml-2" disabled>Upload</button>
-        </div>
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title is-2">
+        Polify
+      </h1>
+      <p class="subtitle">
+        A demo site for the <a href="https://github.com/ClementTsang/polify">Polify</a> library.
+      </p>
 
-        <div class="block">
-          <div class="file has-name is-hidden" id="upload-image-action">
-            <label class="file-label">
-              <input class="file-input" type="file" accept="image/*">
-              <span class="file-cta">
-                <span class="file-icon">
-                  <i class="fas fa-upload"></i>
-                </span>
-                <span class="file-label">
-                  Browse…
-                </span>
+      <div class="tabs ">
+        <ul>
+          <li class="is-active" id="paste-image"><a>Paste image URL</a></li>
+          <li id="upload-image"><a>Upload an Image</a></li>
+        </ul>
+      </div>
+
+      <div class="is-flex is-flex-direction-row" id="paste-image-action">
+        <input class="input is-primary"
+          placeholder="https://images.unsplash.com/photo-1608692702444-3ff552418fb0"></input>
+        <button class="button is-primary ml-2" disabled>Upload</button>
+      </div>
+
+      <div class="block">
+        <div class="file has-name is-hidden" id="upload-image-action">
+          <label class="file-label">
+            <input class="file-input" type="file" accept="image/*">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
               </span>
-              <span class="file-name">
-                No file uploaded
+              <span class="file-label">
+                Browse…
               </span>
-            </label>
+            </span>
+            <span class="file-name">
+              No file uploaded
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="field">
+          <input id="polify-switch" type="checkbox" name="polify-switch" class="switch is-rounded">
+          <label for="polify-switch">Enable Polify</label>
+        </div>
+
+        <div class="columns is-vcentered">
+          <div class="column is-one-fifth">
+            <p class="subtitle">
+              Max vertices
+            </p>
+          </div>
+          <div class="column">
+            <div class="is-flex is-flex-direction-row">
+              <input id="max-vertices" class="slider has-output" min="100" max="50000" value="1000" step="1"
+                disabled="disabled" type="range">
+              <output for="max-vertices">1000</output>
+            </div>
           </div>
         </div>
 
-        <div class="block">
-          <div class="field">
-            <input id="polify-switch" type="checkbox" name="polify-switch" class="switch is-rounded">
-            <label for="polify-switch">Enable Polify</label>
+        <div class="columns is-vcentered">
+          <div class="column is-one-fifth">
+            <p class="subtitle">
+              Edge threshold
+            </p>
           </div>
-
-          <div class="columns is-vcentered">
-            <div class="column is-one-fifth">
-              <p class="subtitle">
-                Max vertices
-              </p>
-            </div>
-            <div class="column">
-              <div class="is-flex is-flex-direction-row">
-                <input id="max-vertices" class="slider has-output" min="100" max="50000" value="1000" step="1" disabled="disabled" type="range">
-                <output for="max-vertices">1000</output>
-              </div>
+          <div class="column">
+            <div class="is-flex is-flex-direction-row">
+              <input id="edge-threshold" class="slider has-output" min="0.0" max="100.0" value="5.0" step="0.1"
+                disabled="disabled" type="range">
+              <output for="edge-threshold">10.0</output>
             </div>
           </div>
-
-          <div class="columns is-vcentered">
-            <div class="column is-one-fifth">
-              <p class="subtitle">
-                Edge threshold
-              </p>
-            </div>
-            <div class="column">
-              <div class="is-flex is-flex-direction-row">
-                <input id="edge-threshold" class="slider has-output" min="0.0" max="200.0" value="10.0" step="0.1" disabled="disabled" type="range">
-                <output for="edge-threshold">10.0</output>
-              </div>
-            </div>
-          </div>
+        </div>
 
 
         <div class="block" style="display: block;">
@@ -103,13 +108,15 @@
         </div>
 
       </div>
-    </section>
-    <footer class="footer">
-      <div class="content has-text-centered">
-        <p class="subtitle is-6">
-          Demo image can be found <a href="https://unsplash.com/photos/5gtsxpZPrkg">here</a>, credit to Ulrich and Mareli Aspeling.
-        </p>
-      </div>
-    </footer>
-  </body>
+  </section>
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p class="subtitle is-6">
+        Demo image can be found <a href="https://unsplash.com/photos/5gtsxpZPrkg">here</a>, credit to Ulrich and Mareli
+        Aspeling.
+      </p>
+    </div>
+  </footer>
+</body>
+
 </html>
