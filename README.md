@@ -26,6 +26,17 @@ Another [picture of mountains, by Anton Lecock](https://unsplash.com/photos/-EJE
 
 ![More mountains after run through polify](examples/simple_test/rocks.png)
 
+## Usage
+
+To generate the WASM package for use in something like NPM, use `wasm-pack`, like so:
+
+```bash
+wasm-pack build --target bundler
+```
+
+and copy the directory where needed.
+
+
 ## Thanks
 
 - To all the photographers whose art I used for demos.
