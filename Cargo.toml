@@ -8,35 +8,47 @@ license = "MIT"
 repository = "https://github.com/ClementTsang/polify"
 
 [dependencies]
-image = { version = "0.23.12", default-features = false, features = [ "gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr", "dxt", "dds", "farbfeld" ] } 
-thiserror = "1.0"
-delaunator = "0.2.0"
-rand = "0.8"
-
-futures = "0.1"
-wasm-bindgen = "0.2"
-wasm-bindgen-futures = "0.3"
-js-sys = "0.3"
-web-sys = { version = "0.3", features = [ "Headers", "WorkerGlobalScope", "Response", "ResponseInit", "console" ] }
+thiserror = "1.0.58"
+delaunator = "1.0.2"
+rand = "0.8.5"
+image = { version = "0.23.14", default-features = false, features = [
+    "gif",
+    "jpeg",
+    "ico",
+    "png",
+    "pnm",
+    "tga",
+    "tiff",
+    "webp",
+    "bmp",
+    "hdr",
+    "dxt",
+    "dds",
+    "farbfeld",
+] } # 0.24+ seems to have issues?
+futures = "0.3.30"
+wasm-bindgen = "0.2.92"
+wasm-bindgen-futures = "0.4.42"
+js-sys = "0.3.69"
+web-sys = { version = "0.3.69", features = ["Headers", "WorkerGlobalScope", "Response", "ResponseInit", "console"] }
 
 # For normal usage
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-rayon = "1.5.0"
-imageproc = "0.22.0"
+rayon = "1.10.0"
+imageproc = "0.22.0" # 0.23+ seems to have issues?
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 imageproc = { version = "0.22.0", default-features = false }
-getrandom = { version = "0.2.1", features = ["js"] }
+getrandom = { version = "0.2.12", features = ["js"] }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [workspace]
-members = [
-    "examples/simple_test",
-]
+members = ["examples/simple_test"]
 
 [profile.release]
-# debug = true
+strip = "symbols"
+debug = false
 lto = true
 opt-level = "s"

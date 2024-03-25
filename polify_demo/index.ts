@@ -339,7 +339,7 @@ class PolifyDemo {
     ]);
 
     worker.onmessage = (e: any) => {
-      console.log("Received message from worker");
+      console.log(`Received message from worker.`);
 
       if (e.data !== null) {
         this.imageBlob = e.data;
@@ -364,7 +364,7 @@ class PolifyDemo {
         this.enableSliders();
       }
 
-      console.log("Terminating worker.  Bye-bye!");
+      console.log("Terminating worker. Bye-bye!");
       worker.terminate();
     };
   }

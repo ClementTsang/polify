@@ -12,9 +12,6 @@ pub enum PolifyError {
     #[error("file already exists at {0}")]
     /// An error if a file already exists at the given save location.
     FileAlreadyExists(String),
-    #[error("no triangulation exists for this input")]
-    /// An error formed if triangulation fails.
-    Triangulation,
     #[error("setting is not valid: {0}")]
     /// An error formed if a setting is invalid.
     InvalidSetting(String),

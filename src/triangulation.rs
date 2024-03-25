@@ -3,8 +3,6 @@
 //!
 //! Approach based on https://cjqian.github.io/docs/tri_iw_paper.pdf
 
-use crate::PolifyError;
-
 use delaunator::triangulate;
 use image::{DynamicImage, GrayImage, ImageBuffer, Luma, Rgb, RgbImage};
 use imageproc::definitions::HasBlack;
@@ -304,7 +302,7 @@ pub fn triangulation(
     node_list: NodeList,
 ) -> crate::error::Result<DynamicImage> {
     // ...because why write our own?
-    let triangulation = triangulate(&node_list.list).ok_or(PolifyError::Triangulation)?;
+    let triangulation = triangulate(&node_list.list);
 
     // Now let's convert the triangulation into an image.
     let rgb_img = image.clone().into_rgba8();
