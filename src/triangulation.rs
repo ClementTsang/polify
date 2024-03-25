@@ -4,18 +4,11 @@
 //! Approach based on https://cjqian.github.io/docs/tri_iw_paper.pdf
 
 use delaunator::triangulate;
-use image::{DynamicImage, GrayImage, ImageBuffer, Luma, Rgb, RgbImage};
-use imageproc::definitions::HasBlack;
-use imageproc::definitions::HasWhite;
+use image::{DynamicImage, GrayImage, Rgb, RgbImage};
 use imageproc::drawing::draw_polygon_mut;
 use rand::seq::IteratorRandom;
 
 use wasm_bindgen::prelude::*;
-
-// #[cfg(target_arch = "wasm32")]
-
-#[cfg(not(target_arch = "wasm32"))]
-use rayon::prelude::*;
 
 #[wasm_bindgen]
 /// A `TriangulationConfig` is the parameters that will affect the triangulation
@@ -124,122 +117,16 @@ pub fn preprocess_image(
         ));
     }
 
-    Ok(PreprocessedImage {
-        image: canny(
-            image
-                .grayscale()
-                .as_luma8()
-                .ok_or(crate::error::PolifyError::LumaConversion)?,
-            low_threshold,
-            high_threshold,
-        )?,
-    })
-}
+    let image = imageproc::edges::canny(
+        image
+            .grayscale()
+            .as_luma8()
+            .ok_or(crate::error::PolifyError::LumaConversion)?,
+        low_threshold,
+        high_threshold,
+    );
 
-fn canny(
-    image: &GrayImage,
-    low_threshold: f32,
-    high_threshold: f32,
-) -> crate::error::Result<GrayImage> {
-    use std::cmp::{max, min};
-
-    // Quick blur
-    const BLUR: u32 = 7;
-    const RATE: f32 = 0.05;
-    const KERNEL: [f32; 9] = [1.0, 1.0, 1.0, 1.0, -8.0, 1.0, 1.0, 1.0, 1.0];
-
-    let (width, height) = image.dimensions();
-
-    #[cfg(target_arch = "wasm32")]
-    let blurred_image: ImageBuffer<Luma<f32>, Vec<f32>> = ImageBuffer::from_vec(
-        width,
-        height,
-        (0..width)
-            .map(|i| {
-                (0..height).map(move |j| {
-                    let h: f32 = (max(0, i - BLUR)..min(width - 1, i + BLUR))
-                        .map(|x| image.get_pixel(x, j).0[0] as f32 / (2 * BLUR) as f32)
-                        .sum();
-
-                    h / (2.0 * RATE)
-                })
-            })
-            .flatten()
-            .collect::<Vec<_>>(),
-    )
-    .ok_or(crate::error::PolifyError::PreProcessing)?;
-
-    #[cfg(not(target_arch = "wasm32"))]
-    let blurred_image: ImageBuffer<Luma<f32>, Vec<f32>> = ImageBuffer::from_vec(
-        width,
-        height,
-        (0..width)
-            .into_par_iter()
-            .map(|i| {
-                (0..height).into_par_iter().map(move |j| {
-                    let h: f32 = (max(0, i - BLUR)..min(width - 1, i + BLUR))
-                        .map(|x| image.get_pixel(x, j).0[0] as f32 / (2 * BLUR) as f32)
-                        .sum();
-
-                    h / (2.0 * RATE)
-                })
-            })
-            .flatten()
-            .collect::<Vec<_>>(),
-    )
-    .ok_or(crate::error::PolifyError::PreProcessing)?;
-
-    // Apply filter
-    let filtered_image = image::imageops::filter3x3(&blurred_image, &KERNEL);
-
-    Ok(hysteresis(&filtered_image, low_threshold, high_threshold))
-}
-
-/// Filter out edges with the thresholds.  Non-recursive breadth-first search.  From imageproc.
-fn hysteresis(
-    input: &ImageBuffer<Luma<f32>, Vec<f32>>,
-    low_thresh: f32,
-    high_thresh: f32,
-) -> ImageBuffer<Luma<u8>, Vec<u8>> {
-    let max_brightness = Luma::white();
-    let min_brightness = Luma::black();
-    // Init output image as all black.
-    let mut out = ImageBuffer::from_pixel(input.width(), input.height(), min_brightness);
-    // Stack. Possible optimization: Use previously allocated memory, i.e. gx.
-    let mut edges = Vec::with_capacity(((input.width() * input.height()) / 2) as usize);
-    for y in 1..input.height() - 1 {
-        for x in 1..input.width() - 1 {
-            let inp_pix = *input.get_pixel(x, y);
-            let out_pix = *out.get_pixel(x, y);
-            // If the edge strength is higher than high_thresh, mark it as an edge.
-            if inp_pix[0] >= high_thresh && out_pix[0] == 0 {
-                out.put_pixel(x, y, max_brightness);
-                edges.push((x, y));
-                // Track neighbors until no neighbor is >= low_thresh.
-                while !edges.is_empty() {
-                    let (nx, ny) = edges.pop().unwrap();
-                    let neighbor_indices = [
-                        (nx + 1, ny),
-                        (nx + 1, ny + 1),
-                        (nx, ny + 1),
-                        (nx - 1, ny - 1),
-                        (nx - 1, ny),
-                        (nx - 1, ny + 1),
-                    ];
-
-                    for neighbor_idx in &neighbor_indices {
-                        let in_neighbor = *input.get_pixel(neighbor_idx.0, neighbor_idx.1);
-                        let out_neighbor = *out.get_pixel(neighbor_idx.0, neighbor_idx.1);
-                        if in_neighbor[0] >= low_thresh && out_neighbor[0] == 0 {
-                            out.put_pixel(neighbor_idx.0, neighbor_idx.1, max_brightness);
-                            edges.push((neighbor_idx.0, neighbor_idx.1));
-                        }
-                    }
-                }
-            }
-        }
-    }
-    out
+    Ok(PreprocessedImage { image })
 }
 
 /// Detects nodes in a pre-processed image.
@@ -257,9 +144,13 @@ pub fn node_detection(
 
     for i in 0..width {
         for j in 0..height {
-            let sum_of_pixels: f64 = (max(0, i - 1)..min(width - 1, i + 1))
+            let width_range = max(0, i - 1)..min(width - 1, i + 1);
+
+            let sum_of_pixels: f64 = width_range
                 .map(|x| {
-                    (max(0, j - 1)..min(height - 1, j + 1))
+                    let height_range = max(0, j - 1)..min(height - 1, j + 1);
+
+                    height_range
                         .map(|y| preprocessed_image.image.get_pixel(x, y).0[0] as u32)
                         .sum::<u32>()
                 })

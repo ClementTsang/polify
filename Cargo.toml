@@ -11,21 +11,6 @@ repository = "https://github.com/ClementTsang/polify"
 thiserror = "1.0.58"
 delaunator = "1.0.2"
 rand = "0.8.5"
-image = { version = "0.23.14", default-features = false, features = [
-    "gif",
-    "jpeg",
-    "ico",
-    "png",
-    "pnm",
-    "tga",
-    "tiff",
-    "webp",
-    "bmp",
-    "hdr",
-    "dxt",
-    "dds",
-    "farbfeld",
-] } # 0.24+ seems to have issues?
 futures = "0.3.30"
 wasm-bindgen = "0.2.92"
 wasm-bindgen-futures = "0.4.42"
@@ -34,11 +19,13 @@ web-sys = { version = "0.3.69", features = ["Headers", "WorkerGlobalScope", "Res
 
 # For normal usage
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+image = { version = "0.25.0", default-features = true }
+imageproc = "0.24.0"
 rayon = "1.10.0"
-imageproc = "0.22.0" # 0.23+ seems to have issues?
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-imageproc = { version = "0.22.0", default-features = false }
+image = { version = "0.25.0", default-features = false, features = ["default-formats"] }
+imageproc = { version = "0.24.0", default-features = false }
 getrandom = { version = "0.2.12", features = ["js"] }
 
 [lib]
