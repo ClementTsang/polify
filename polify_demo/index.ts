@@ -92,6 +92,7 @@ class PolifyDemo {
       uploadImageTab.classList.remove("is-active");
 
       uploadImageAction.classList.add("is-hidden");
+      pasteImageAction.classList.add("is-flex");
       pasteImageAction.classList.remove("is-hidden");
     });
 
@@ -100,6 +101,7 @@ class PolifyDemo {
       pasteImageTab.classList.remove("is-active");
 
       pasteImageAction.classList.add("is-hidden");
+      pasteImageAction.classList.remove("is-flex");
       uploadImageAction.classList.remove("is-hidden");
     });
 
