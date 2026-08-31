@@ -2,6 +2,6 @@
 **/*.rs.bk
 # Cargo.lock
 .vscode
-public
+/public
 polify_demo/dist
 pkg
