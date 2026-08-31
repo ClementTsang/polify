@@ -31,6 +31,12 @@ getrandom = { version = "0.2.12", features = ["js"] }
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+# wasm-opt (run by wasm-pack) uses an older validator that rejects the
+# bulk-memory and nontrapping-float-to-int features that current Rust/LLVM
+# emit by default. Enable them explicitly so optimization still runs.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-O', '--enable-bulk-memory', '--enable-nontrapping-float-to-int']
+
 [workspace]
 members = ["examples/simple_test"]
 
